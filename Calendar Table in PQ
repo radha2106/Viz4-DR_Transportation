@@ -1,0 +1,25 @@
+let
+    Source = #date(2020, 1, 1),
+    Custom1 = List.Dates(Source,Number.From(#date(2021,1,1))-Number.From(Source),#duration(1,0,0,0)),
+    #"Converted to Table" = Table.FromList(Custom1, Splitter.SplitByNothing(), null, null, ExtraValues.Error),
+    #"Changed Type" = Table.TransformColumnTypes(#"Converted to Table",{{"Column1", type date}}),
+    #"Renamed Columns" = Table.RenameColumns(#"Changed Type",{{"Column1", "Dates"}}),
+    #"Inserted Year" = Table.AddColumn(#"Renamed Columns", "Year", each Date.Year([Dates]), Int64.Type),
+    #"Inserted Month" = Table.AddColumn(#"Inserted Year", "Month", each Date.Month([Dates]), Int64.Type),
+    #"Inserted Month Name" = Table.AddColumn(#"Inserted Month", "Month Name", each Date.MonthName([Dates]), type text),
+    #"Extracted First Characters" = Table.TransformColumns(#"Inserted Month Name", {{"Month Name", each Text.Start(_, 3), type text}}),
+    #"Inserted Day" = Table.AddColumn(#"Extracted First Characters", "Day", each Date.Day([Dates]), Int64.Type),
+    #"Added Conditional Column" = Table.AddColumn(#"Inserted Day", "Mins", each if [Day] <= 15 then 1 else if [Day] >= 16 then 15 else null),
+    #"Added Conditional Column1" = Table.AddColumn(#"Added Conditional Column", "Maxs", each if [Day] <= 15 then 15 else if [Day] >= 16 then 30 else null),
+    #"Changed Type1" = Table.TransformColumnTypes(#"Added Conditional Column1",{{"Maxs", Int64.Type}, {"Mins", Int64.Type}}),
+    #"Inserted Merged Column" = Table.AddColumn(#"Changed Type1", "Merged", each Text.Combine({[Month Name], "/", Text.From([Mins], "en-US"), " to ", [Month Name], "/", Text.From([Maxs], "en-US")}), type text),
+    #"Renamed Columns1" = Table.RenameColumns(#"Inserted Merged Column",{{"Merged", "BiWeekGroup"}}),
+    #"Removed Columns" = Table.RemoveColumns(#"Renamed Columns1",{"Mins", "Maxs"}),
+    #"Added Index" = Table.AddIndexColumn(#"Removed Columns", "Index", 1, 1, Int64.Type),
+    #"Reordered Columns" = Table.ReorderColumns(#"Added Index",{"Index", "Dates", "Year", "Month", "Month Name", "Day", "BiWeekGroup"}),
+    #"Merged Queries" = Table.NestedJoin(#"Reordered Columns", {"BiWeekGroup"}, BiWeekGroup, {"WeekGroup"}, "BiWeekGroup.1", JoinKind.Inner),
+    #"Expanded BiWeekGroup.1" = Table.ExpandTableColumn(#"Merged Queries", "BiWeekGroup.1", {"Index"}, {"Index.1"}),
+    #"Renamed Columns2" = Table.RenameColumns(#"Expanded BiWeekGroup.1",{{"Index.1", "WeekIndex"}}),
+    #"Removed Columns1" = Table.RemoveColumns(#"Renamed Columns2",{"BiWeekGroup"})
+in
+    #"Removed Columns1"
