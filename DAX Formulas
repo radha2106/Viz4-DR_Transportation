@@ -1,94 +1,123 @@
-'Medidas'[DateUpdated] = "Actualizado a: "&FORMAT(CALCULATE(MAX(Calendar[Dates]),ALL()),"DD-MMM-YYYY")
-'Medidas'[TtGanancia] = 
-VAR bus=CALCULATE(SUM(Transport[passangers])*15,Transport[method_id]=1)
-VAR metro=CALCULATE(SUM(Transport[passangers])*15,Transport[method_id]=2)
-VAR cablecar=CALCULATE(SUM(Transport[passangers])*15,Transport[method_id]=3)
+MEASURE 'Medidas'[DateUpdated] = "Actualizado a: "&FORMAT(CALCULATE(MAX('Calendar'[ddates]),ALL()),"DD-MMM-YYYY")
+
+MEASURE 'Medidas'[TtGanancia] = 
+VAR bus=CALCULATE(SUM(Fullinfo[pasajeros])*15,Fullinfo[via_id]=1)
+VAR metro=CALCULATE(SUM(Fullinfo[pasajeros])*15,Fullinfo[via_id]=2)
+VAR cablecar=CALCULATE(SUM(Fullinfo[pasajeros])*15,Fullinfo[via_id]=3)
 RETURN
 SWITCH(true,
-SELECTEDVALUE(Method[method])="bus",bus,
-SELECTEDVALUE(Method[method])="cablecar",cablecar,
-SELECTEDVALUE(Method[method])="metro",metro)
-'Medidas'[AvgPasajeros] = 
-VAR bus=CALCULATE(AVERAGE(Transport[passangers]),Transport[method_id]=1)
-VAR metro=CALCULATE(AVERAGE(Transport[passangers]),Transport[method_id]=2)
-VAR cablecar=CALCULATE(AVERAGE(Transport[passangers]),Transport[method_id]=3)
+SELECTEDVALUE(Metodos[vias])="bus",bus,
+SELECTEDVALUE(Metodos[vias])="cablecar",cablecar,
+SELECTEDVALUE(Metodos[vias])="metro",metro)
+
+MEASURE 'Medidas'[AvgPasajeros] = 
+VAR bus=CALCULATE(AVERAGE(Fullinfo[pasajeros]),Fullinfo[via_id]=1)
+VAR metro=CALCULATE(AVERAGE(Fullinfo[pasajeros]),Fullinfo[via_id]=2)
+VAR cablecar=CALCULATE(AVERAGE(Fullinfo[pasajeros]),Fullinfo[via_id]=3)
 RETURN
 SWITCH(true,
-SELECTEDVALUE(Method[method])="bus",bus,
-SELECTEDVALUE(Method[method])="cablecar",cablecar,
-SELECTEDVALUE(Method[method])="metro",metro)
-'Medidas'[TtPasajeros] = 
-VAR bus=CALCULATE(SUM(Transport[passangers]),Transport[method_id]=1)
-VAR metro=CALCULATE(SUM(Transport[passangers]),Transport[method_id]=2)
-VAR cablecar=CALCULATE(SUM(Transport[passangers]),Transport[method_id]=3)
+SELECTEDVALUE(Metodos[vias])="bus",bus,
+SELECTEDVALUE(Metodos[vias])="cablecar",cablecar,
+SELECTEDVALUE(Metodos[vias])="metro",metro)
+
+MEASURE 'Medidas'[TtPasajeros] = 
+VAR bus=CALCULATE(SUM(Fullinfo[pasajeros]),Fullinfo[via_id]=1)
+VAR metro=CALCULATE(SUM(Fullinfo[pasajeros]),Fullinfo[via_id]=2)
+VAR cablecar=CALCULATE(SUM(Fullinfo[pasajeros]),Fullinfo[via_id]=3)
 RETURN
 SWITCH(true,
-SELECTEDVALUE(Method[method])="bus",bus,
-SELECTEDVALUE(Method[method])="cablecar",cablecar,
-SELECTEDVALUE(Method[method])="metro",metro)
-'Medidas'[AvgGanancia] = 
-VAR bus=CALCULATE(AVERAGE(Transport[passangers])*15,Transport[method_id]=1)
-VAR metro=CALCULATE(AVERAGE(Transport[passangers])*15,Transport[method_id]=2)
-VAR cablecar=CALCULATE(AVERAGE(Transport[passangers])*15,Transport[method_id]=3)
+SELECTEDVALUE(Metodos[vias])="bus",bus,
+SELECTEDVALUE(Metodos[vias])="cablecar",cablecar,
+SELECTEDVALUE(Metodos[vias])="metro",metro)
+
+MEASURE 'Medidas'[AvgGanancia] = 
+VAR bus=CALCULATE(AVERAGE(Fullinfo[pasajeros])*15,Fullinfo[via_id]=1)
+VAR metro=CALCULATE(AVERAGE(Fullinfo[pasajeros])*15,Fullinfo[via_id]=2)
+VAR cablecar=CALCULATE(AVERAGE(Fullinfo[pasajeros])*15,Fullinfo[via_id]=3)
 RETURN
 SWITCH(true,
-SELECTEDVALUE(Method[method])="bus",bus,
-SELECTEDVALUE(Method[method])="cablecar",cablecar,
-SELECTEDVALUE(Method[method])="metro",metro)
-'Medidas'[MaxMinPoint] = 
-VAR p1=MAXX(ALLSELECTED(Calendar[Year],Calendar[Month Name],Calendar[Day]),[TtGanancia])
-VAR p2=MINX(ALLSELECTED(Calendar[Year],Calendar[Month Name],Calendar[Day]),[TtGanancia])
+SELECTEDVALUE(Metodos[vias])="bus",bus,
+SELECTEDVALUE(Metodos[vias])="cablecar",cablecar,
+SELECTEDVALUE(Metodos[vias])="metro",metro)
+
+MEASURE 'Medidas'[MaxMinPoint] = 
+VAR p1=MAXX(ALLSELECTED('Calendar'[years],'Calendar'[month_name],'Calendar'[day_number]),[TtGanancia])
+VAR p2=MINX(ALLSELECTED('Calendar'[years],'Calendar'[month_name],'Calendar'[day_number]),[TtGanancia])
 RETURN
-SWITCH(TRUE(),p1=[TtGanancia],"#ffffff",p2=[TtGanancia],"#ffffff")
-'Medidas'[YAxisMax] = MAXX(ALLSELECTED(Calendar[Dates]),[TtGanancia])*1.0123
-'Medidas'[YAxisMin] = MINX(ALLSELECTED(Calendar[Dates]),[TtGanancia])*0.987
-'Medidas'[MaxCapacityHour] = SUM(Transport[max_per_hour])
-'Medidas'[MaxRatio] = DIVIDE([TtPasajeros],[MaxCapacityHour])
-'Medidas'[PassRatio2] = 1-[MaxRatio]
-'Medidas'[MaxCapacityDay] = SUM(Transport[max_per_hour])*15
-'Medidas'[SemPasGanancia] = 
-VAR p1=
-CALCULATE([TtGanancia],FILTER(ALL('Calendar'),'Calendar'[WeekIndex]=SELECTEDVALUE('Calendar'[WeekIndex])-1))
+SWITCH(TRUE(),p1=[TtGanancia],"#E6E6E6",p2=[TtGanancia],"#E6E6E6")
+
+MEASURE 'Medidas'[YAxisMax] = MAXX(ALLSELECTED('Calendar'[ddates]),[TtGanancia])*1.0123
+MEASURE 'Medidas'[YAxisMin] = MINX(ALLSELECTED('Calendar'[ddates]),[TtGanancia])*0.987
+MEASURE 'Medidas'[MaxCapacityHour] = SUM(Fullinfo[Capacidad.max_cap])
+MEASURE 'Medidas'[MaxRatio] = DIVIDE([TtPasajeros],[MaxCapacityHour])
+MEASURE 'Medidas'[PassRatio2] = 1-[MaxRatio]
+MEASURE 'Medidas'[MaxCapacityDay] = SUM(Fullinfo[Capacidad.max_cap])*15
+
+MEASURE 'Medidas'[MesPasGanancia] =
+VAR p1=CALCULATE([TtGanancia],PREVIOUSMONTH('Calendar'[ddates]))
 RETURN
 SWITCH(true(),
-SELECTEDVALUE('Calendar'[WeekIndex])=1,BLANK(),
-SELECTEDVALUE('Calendar'[WeekIndex])<>1,
-p1)
-'Medidas'[Crecimiento] = 
+SELECTEDVALUE('Calendar'[months])=1,BLANK(),
+SELECTEDVALUE('Calendar'[months])<>1,p1)
+
+MEASURE 'Medidas'[Crecimiento] = 
 VAR up= UNICHAR(129157)
 VAR down=UNICHAR(129158)
-VAR lastweek=[SemPasGanancia]
-VAR growth=DIVIDE([TtGanancia]-lastweek,lastweek)
+VAR lastmonth=[MesPasGanancia]
+VAR actual=[TtGanancia]
 RETURN
 SWITCH(TRUE(),
-lastweek=BLANK(),BLANK(),
-growth<0,down&" "&ROUND(growth*100,2)&"%",
-growth>0,up&" "&ROUND(growth*100,2)&"%")
-'Medidas'[SemPasPasajeros] = 
-VAR p1=CALCULATE([TtPasajeros],FILTER(ALL('Calendar'),'Calendar'[WeekIndex]=SELECTEDVALUE('Calendar'[WeekIndex])-1))
+lastmonth=BLANK(),BLANK(),
+actual>lastmonth,up,
+actual<lastmonth,down)
+
+MEASURE 'Medidas'[MesPasPasajeros] = 
+VAR p1=CALCULATE([TtPasajeros],PREVIOUSMONTH('Calendar'[ddates]))
 RETURN
 SWITCH(true(),
-SELECTEDVALUE('Calendar'[WeekIndex])=1,BLANK(),
-SELECTEDVALUE('Calendar'[WeekIndex])<>1,
-p1)
-'Medidas'[ColorGrowth] = 
-VAR growth= DIVIDE([TtGanancia]-[SemPasGanancia],[SemPasGanancia])
+SELECTEDVALUE('Calendar'[months])=1,BLANK(),
+SELECTEDVALUE('Calendar'[months])<>1,p1)
+
+MEASURE 'Medidas'[ColorGrowth] = 
+VAR growth= DIVIDE([TtGanancia]-[MesPasGanancia],[MesPasGanancia])
 RETURN
 SWITCH(TRUE(),
-growth=BLANK(),"#ADB5BD",
-growth>0,"#45DCB9",
+growth=BLANK(),"#E6E6E6",
+growth>0,"#18E6BF",
 growth<0,"#FF204E")
-'Medidas'[SemPasAvgGan] = 
-VAR p1=CALCULATE([AvgGanancia],FILTER(ALL('Calendar'),'Calendar'[WeekIndex]=SELECTEDVALUE('Calendar'[WeekIndex])-1))
+
+MEASURE 'Medidas'[MesPasAvgGan] = 
+VAR p1=CALCULATE([AvgGanancia],PREVIOUSMONTH('Calendar'[ddates]))
 RETURN
 SWITCH(true(),
-SELECTEDVALUE('Calendar'[WeekIndex])=1,BLANK(),
-SELECTEDVALUE('Calendar'[WeekIndex])<>1,
-p1)
-'Medidas'[SemPasAvgPasa] = 
-VAR p1=CALCULATE([AvgPasajeros],FILTER(ALL('Calendar'),'Calendar'[WeekIndex]=SELECTEDVALUE('Calendar'[WeekIndex])-1))
+SELECTEDVALUE('Calendar'[months])=1,BLANK(),
+SELECTEDVALUE('Calendar'[months])<>1,p1)
+
+MEASURE 'Medidas'[MesPasAvgPasa] = 
+VAR p1=CALCULATE([AvgPasajeros],PREVIOUSMONTH('Calendar'[ddates]))
 RETURN
 SWITCH(true(),
-SELECTEDVALUE('Calendar'[WeekIndex])=1,BLANK(),
-SELECTEDVALUE('Calendar'[WeekIndex])<>1,
-p1)
+SELECTEDVALUE('Calendar'[months])=1,BLANK(),
+SELECTEDVALUE('Calendar'[months])<>1,p1)
+
+EVALUATE
+    SUMMARIZECOLUMNS(
+        "DateUpdated", 'Medidas'[DateUpdated],
+        "TtGanancia", 'Medidas'[TtGanancia],
+        "AvgPasajeros", 'Medidas'[AvgPasajeros],
+        "TtPasajeros", 'Medidas'[TtPasajeros],
+        "AvgGanancia", 'Medidas'[AvgGanancia],
+        "MaxMinPoint", 'Medidas'[MaxMinPoint],
+        "YAxisMax", 'Medidas'[YAxisMax],
+        "YAxisMin", 'Medidas'[YAxisMin],
+        "MaxCapacityHour", 'Medidas'[MaxCapacityHour],
+        "MaxRatio", 'Medidas'[MaxRatio],
+        "PassRatio2", 'Medidas'[PassRatio2],
+        "MaxCapacityDay", 'Medidas'[MaxCapacityDay],
+        "MesPasGanancia", 'Medidas'[MesPasGanancia],
+        "Crecimiento", 'Medidas'[Crecimiento],
+        "MesPasPasajeros", 'Medidas'[MesPasPasajeros],
+        "ColorGrowth", 'Medidas'[ColorGrowth],
+        "MesPasAvgGan", 'Medidas'[MesPasAvgGan],
+        "MesPasAvgPasa", 'Medidas'[MesPasAvgPasa]
+    )
