@@ -38,7 +38,7 @@ Better PBI details here:
 - [Data Modeling](https://github.com/radha2106/Viz4-DR_Transportation/blob/main/DataModel.png)
 
 Full Dashboard is here:
-- [Viz3](https://project.novypro.com/HH9naZ)
+- [Viz3](https://app.powerbi.com/view?r=eyJrIjoiOWZlN2Y2NDEtOWQwNC00MzBmLWIwNzMtZTY1OTkyZDhmM2IwIiwidCI6IjQ4MjkzMjgyLTgzMmQtNGQwYi05ZTBmLTVmMmFmYTg5YTFlNCIsImMiOjJ9&pageName=ReportSectiond92f28b790ab9efba978)
 
 ## Colors Used Reference
 
