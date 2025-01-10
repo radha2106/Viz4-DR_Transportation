@@ -23,6 +23,10 @@ This comprehensive overview enables stakeholders to make informed, data-driven d
 - Create a all-in table info (this table will serve to separate types of transportation)
 - Create views for maximum passangers based on method of transportation
 
+### Steps in Python
+- Since excel can get slow with long calculation rows is better to create them in Python with this: [Python rows creation](https://github.com/radha2106/Viz4-DR_Transportation/blob/main/long_csv_generator.py)
+- Then filter/clean/merge/lookup necessary files using this: [Python EDA](https://github.com/radha2106/Viz4-DR_Transportation/blob/main/eda_python.py)
+
 ## Steps in PBI
 - Connect PBI query to ODBC query and import the tables
 - Make relationship between tables
