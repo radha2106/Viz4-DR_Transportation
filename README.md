@@ -40,6 +40,8 @@ Better PBI details here:
 Full Dashboard is here:
 - [Viz3](https://app.powerbi.com/view?r=eyJrIjoiOWZlN2Y2NDEtOWQwNC00MzBmLWIwNzMtZTY1OTkyZDhmM2IwIiwidCI6IjQ4MjkzMjgyLTgzMmQtNGQwYi05ZTBmLTVmMmFmYTg5YTFlNCIsImMiOjJ9&pageName=ReportSectiond92f28b790ab9efba978)
 
+Map of Dominican Republic (JSON): [Map](https://github.com/radha2106/Viz4-DR_Transportation/blob/main/Provincias%20(1).json)
+
 ## Colors Used Reference
 
 | Colors             | Hex Value                                                               |
