@@ -2,14 +2,14 @@ CREATE DATABASE transporte;
 USE transporte;
 -- Create the calendar table
 CREATE TABLE calendar (
-    idx BIGINT AUTO_INCREMENT NOT NULL PRIMARY KEY,
-    ddates DATE NOT NULL UNIQUE,
-    years INT NOT NULL,
-    months INT NOT NULL,
-    months_name VARCHAR(3) NOT NULL,
-    day_number INT NOT NULL,
-    day_name VARCHAR(3) NOT NULL,
-    week_day INT NOT NULL    
+	idx BIGINT AUTO_INCREMENT NOT NULL PRIMARY KEY,
+	ddates DATE NOT NULL UNIQUE,
+	years INT NOT NULL,
+	months INT NOT NULL,
+	months_name VARCHAR(3) NOT NULL,
+	day_number INT NOT NULL,
+	day_name VARCHAR(3) NOT NULL,
+	week_day INT NOT NULL    
 );
 -- Set the date range for dates to be added
 SET @Startdate = '2020-01-01';
@@ -33,11 +33,10 @@ SELECT
     WEEKDAY(CalendarDate)+1 AS week_day
 FROM 
     DateRange;
-
 ---------------------------------------------------
 CREATE TABLE hours(
-    idx INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
-    thours TIME NOT NULL UNIQUE
+	idx INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
+	thours TIME NOT NULL UNIQUE
 );
 
 -- Set the start and end times
@@ -57,39 +56,52 @@ SELECT thours
 FROM TimeRange;
 --------------------------------------
 CREATE TABLE metodos (
-idx INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
-vias VARCHAR(8) NOT NULL UNIQUE)
+	idx INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
+	vias VARCHAR(8) NOT NULL UNIQUE)
 --------------------
-CREATE TABLE fullinfo (
-ddate_id BIGINT NOT NULL,
-hour_id BIGINT NOT NULL,
-pasajeros INT NOT NULL,
-via_id BIGINT NOT NULL,
-FOREIGN KEY(ddate_id) REFERENCES calendar(idx)
-ON UPDATE CASCADE
-ON DELETE RESTRICT,
-FOREIGN KEY(hour_id) REFERENCES hours(idx)
-ON UPDATE CASCADE
-ON DELETE RESTRICT,
-FOREIGN KEY(via_id) REFERENCES metodos(idx)
-ON UPDATE CASCADE
-ON DELETE RESTRICT);
+CREATE TABLE fullinfo(
+	id_province BIGINT NOT NULL,
+	id_date BIGINT NOT NULL,
+	id_transp BIGINT NOT NULL,
+	id_hour BIGINT NOT NULL,
+	passangers INT NOT NULL,
+		FOREIGN KEY(id_province) REFERENCES provincias(idx)
+		ON UPDATE CASCADE
+		ON DELETE RESTRICT,
+		FOREIGN KEY(id_date) REFERENCES calendar(idx)
+		ON UPDATE CASCADE
+		ON DELETE RESTRICT,
+		FOREIGN KEY(id_hour) REFERENCES hours(idx)
+		ON UPDATE CASCADE
+		ON DELETE RESTRICT,
+		FOREIGN KEY(id_transp) REFERENCES metodos(idx)
+		ON UPDATE CASCADE
+		ON DELETE RESTRICT);
 -----------------------
-CREATE TABLE capacidad (
-hour_id BIGINT NOT NULL,
-min_cap INT NOT NULL,
-max_cap INT NOT NULL,
-date_id BIGINT NOT NULL,
-via_id BIGINT NOT NULL,
-FOREIGN KEY (hour_id) REFERENCES hours (idx)
-ON UPDATE CASCADE
-ON DELETE RESTRICT,
-FOREIGN KEY (date_id) REFERENCES calendar (idx)
-ON UPDATE CASCADE
-ON DELETE RESTRICT,
-FOREIGN KEY (via_id) REFERENCES metodos (idx)
-ON UPDATE CASCADE
-ON DELETE RESTRICT);
+ CREATE TABLE capacidad(
+ 	id_province BIGINT NOT NULL,
+	id_transp BIGINT NOT NULL,
+	id_hour BIGINT NOT NULL,
+	min_cap INT NOT NULL,
+  	max_cap INT NOT NULL,
+		FOREIGN KEY(id_province) REFERENCES provincias(idx)
+		ON UPDATE CASCADE
+		ON DELETE RESTRICT,
+		FOREIGN KEY(id_date) REFERENCES calendar(idx)
+		ON UPDATE CASCADE
+		ON DELETE RESTRICT,
+		FOREIGN KEY(id_hour) REFERENCES hours(idx)
+		ON UPDATE CASCADE
+		ON DELETE RESTRICT,
+		FOREIGN KEY(id_transp) REFERENCES metodos(idx)
+		ON UPDATE CASCADE
+		ON DELETE RESTRICT);
+-----------------------------
+CREATE TABLE provincias (
+	idx INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	idx_province VARCHAR(5) NOT NULL,
+	province VARCHAR(25) NOT NULL,
+	region VARCHAR(5) NOT NULL);
 ----------------------
 LOAD DATA INFILE '' -- file path
 INTO TABLE --table name
@@ -102,6 +114,7 @@ IGNORE 1 ROWS
 CREATE INDEX months_names
 ON calendar (months,months_name)
 ------------------------
+--Trigger
 DELIMITER //
 CREATE TRIGGER check_passengers_before_insert
 BEFORE INSERT ON fullinfo
@@ -112,12 +125,29 @@ BEGIN
 
     SELECT min_cap, max_cap INTO v_min_cap, v_max_cap
     FROM capacidad
-    WHERE hour_id = NEW.hour_id AND via_id = NEW.via_id;
+    WHERE id_transp = NEW.id_transp 
+        AND id_province = NEW.id_province;
 
-    IF NEW.pasajeros < v_min_cap OR NEW.pasajeros > v_max_cap THEN
+    IF NEW.passangers < v_min_cap AND NEW.passangers > v_max_cap THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Passengers count is out of range.';
     END IF;
 END;
 //
 DELIMITER ;
+---------------------------------
+-- Views Tables
+CREATE OR REPLACE VIEW v_bus AS(
+SELECT *
+FROM fullinfo
+WHERE id_transp=1);
+
+CREATE OR REPLACE VIEW v_metro AS(
+SELECT *
+FROM fullinfo
+WHERE id_transp=2);
+
+CREATE OR REPLACE VIEW v_cablecar AS(
+SELECT *
+FROM fullinfo
+WHERE id_transp=3);
